@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Special Surprise</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a0d2e 0%, #2d1b4e 50%, #4a3570 100%);
+            color: white;
+            font-family: 'Georgia', serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            color: #ffd700;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        #qrcode {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            display: inline-block;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin: 30px 0;
+            min-height: 100px;
+        }
+
+        .instructions {
+            font-size: 1.2em;
+            margin-top: 30px;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ffd700;
+            border-radius: 50%;
+            animation: sparkle 2s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        .url-display {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .url-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 2px solid #ffd700;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .generate-btn {
+            background: #ffd700;
+            color: #1a0d2e;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .generate-btn:hover {
+            background: #ffed4e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+        }
+
+        .qr-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .loading {
+            color: #ffd700;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="sparkle" style="top: 10%; left: 15%; animation-delay: 0s;"></div>
+    <div class="sparkle" style="top: 20%; right: 20%; animation-delay: 0.5s;"></div>
+    <div class="sparkle" style="bottom: 30%; left: 10%; animation-delay: 1s;"></div>
+    <div class="sparkle" style="bottom: 15%; right: 15%; animation-delay: 1.5s;"></div>
+
+    <div class="container">
+        <h1>✨ A Magical Surprise Awaits ✨</h1>
+        <p class="subtitle">Scan this code to discover your adventure!</p>
+        
+        <div class="url-display" id="urlDisplay">
+            <p style="margin-bottom: 15px; font-weight: bold;">Enter the URL for your surprise page:</p>
+            <input type="text" id="urlInput" class="url-input" placeholder="https://example.com/harry-potter-surprise" value="">
+            <br>
+            <button onclick="generateQR()" class="generate-btn">Generate QR Code</button>
+        </div>
+
+        <div id="qrcode">
+            <p style="color: #666; margin: 40px 0;">Your magical QR code will appear here</p>
+        </div>
+        
+        <p class="instructions">
+            Point your phone's camera at the code above<br>
+            and discover the magical surprise waiting for you!
+        </p>
+    </div>
+
+    <script>
+        function generateQR() {
+            const url = document.getElementById('urlInput').value.trim();
+            
+            if (!url) {
+                alert('Please enter a URL for your surprise page!');
+                return;
+            }
+
+            // Validate URL format
+            try {
+                new URL(url);
+            } catch (e) {
+                alert('Please enter a valid URL (starting with http:// or https://)');
+                return;
+            }
+
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '<div class="loading">✨ Generating your magical QR code... ✨</div>';
+            
+            // Use QR Server API (reliable and simple)
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}&color=1a0d2e&bgcolor=ffffff&margin=10`;
+            
+            const img = document.createElement('img');
+            img.className = 'qr-image';
+            img.src = qrUrl;
+            img.alt = 'QR Code for your surprise';
+            img.style.width = '300px';
+            img.style.height = '300px';
+            
+            img.onload = function() {
+                qrContainer.innerHTML = '';
+                qrContainer.appendChild(img);
+                document.getElementById('urlDisplay').style.display = 'none';
+            };
+            
+            img.onerror = function() {
+                qrContainer.innerHTML = '<p style="color: #ff6b6b; padding: 20px;">Error generating QR code. Please check your internet connection and try again.</p>';
+            };
+        }
+
+        // Add Enter key support
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateQR();
+            }
+        });
+
+        // Test if page loaded correctly
+        console.log('Page loaded successfully!');
+    </script>
+</body>
+</html>
